@@ -9,7 +9,7 @@ const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 
 // @route    GET api/auth
-// @desc     Get user by token
+// @desc     Axios front end global token check setAuthToken
 // @access   Private
 router.get('/', auth, async (req, res) => {
   try {

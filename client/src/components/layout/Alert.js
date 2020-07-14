@@ -17,6 +17,7 @@ Alert.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+// alerts -> any = actually alert(reducer) array type. so alerts goes inside state taking one or more alerts  
   alerts: state.alert //state.singleReducer -> rootReducer
 });
 

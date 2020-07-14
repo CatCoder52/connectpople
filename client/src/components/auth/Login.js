@@ -1,12 +1,16 @@
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux'
+import PropTypes from "prop-types";
+import { login } from '../../actions/auth'
 
+const Login = ({ login, isAuthenticated }) => {
+  const initialState = {
+    email: 'test@gmail.com',
+    password: '123456test'
+  };
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState(initialState);
 
   const { email, password } = formData;
 
@@ -15,15 +19,21 @@ const Login = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log('SUCCESS');
+    login(email, password);
+    setFormData(initialState);
   };
+
+// Redirect if logged in or wait for onSubmit action
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard'/>
+  }
 
   return (
     <React.Fragment>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
+      <br />
+      <br />
+      <br />
+      <br />
       <section className="center-v vh-100">
         <div className="container px-0 z-depth-1 card p-5 cloud my-5">
           {/*Section: Content*/}
@@ -74,7 +84,7 @@ const Login = () => {
                         className="btn btn-success my-4 waves-effect"
                       >
                         Login &nbsp;
-                        <i className="fas fa-arrow-right animated slideOutRight infinite slow"></i>
+                        <i className="fas fa-arrow-right animated slideOutRight infinite slow"/>
                       </button>
                       <p className="text-center">
                         Don't have an account?{' '}
@@ -97,4 +107,14 @@ const Login = () => {
   );
 };
 
-export default Login;
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
+};
+const mapStateToProps = (state) => ({
+  //state.singleReducerName -> rootReducer | auth reducer contains initialState property(isAuthenticated)
+  isAuthenticated: state.auth.isAuthenticated
+});
+
+
+export default connect(mapStateToProps, { login })(Login);

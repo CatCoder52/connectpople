@@ -1,32 +1,45 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { connect } from 'react-redux'
-import { setAlert } from '../../actions/alert'
+import { Link, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { setAlert } from '../../actions/alert';
+import { register } from '../../actions/auth';
 import PropTypes from 'prop-types';
 
-const Register = ({ setAlert }) => {
-  const [formData, setFormData] = useState({
+const Register = ({ setAlert, register, isAuthenticated }) => {
+const initialState = {
     name: '',
     email: '',
     password: '',
     password2: ''
-  });
+}
+  const [formData, setFormData] = useState(initialState);
 
   const { name, email, password, password2 } = formData;
 
-  const onChange= e => setFormData({...formData, [e.target.name]: e.target.value})
+  const onChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = async e => {
-    e.preventDefault()
-    if (password !== password2) return setAlert('Passwords do not match', 'danger')
-    console.log('SUCCESS');
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== password2) {
+      setAlert('Passwords do not match', 'danger');
+    } else {
+      register({ name, email, password });
+      setFormData(initialState);
+    }
+  };
+
+  
+// Redirect if logged in or wait for onSubmit action
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard'/>
   }
 
   return (
     <div className="container my-5 px-0 z-depth-1">
       {/*Section: Content*/}
       <section className="my-md-5 text-center card">
-        <form className="my-5 mx-md-5" onSubmit={e => onSubmit(e)}>
+        <form className="my-5 mx-md-5" onSubmit={(e) => onSubmit(e)}>
           <div className="row">
             <div className="col-md-4 mx-auto text-center center-v paper">
               <h3>Already have an account?</h3>
@@ -113,7 +126,10 @@ const Register = ({ setAlert }) => {
                               className="form-control form-control-lg"
                             />
                           </div>
-                          <button type='submit' className="btn btn-block btn-primary btn-lg mt-4">
+                          <button
+                            type="submit"
+                            className="btn btn-block btn-primary btn-lg mt-4"
+                          >
                             Sign up
                           </button>
                         </div>
@@ -138,6 +154,12 @@ const Register = ({ setAlert }) => {
 
 Register.propTypes = {
   setAlert: PropTypes.func.isRequired,
-}
+  register: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
+};
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated 
+  //state.singleReducerName -> rootReducer | auth reducer contains initialState property(isAuthenticated)
+});
 
-export default connect(null, { setAlert })(Register);
+export default connect(mapStateToProps, { setAlert, register })(Register);
